@@ -44,7 +44,7 @@ public class ControllerUser {
                     Menu menu = new Menu();
                     menu.setVisible(true);
                     Menu.menuFinan.setEnabled(true);
-                    con.close();
+                    ModelConexao.fechaConexao(con);
                     login.dispose();
                 } else {
                     Menu menu = new Menu();
