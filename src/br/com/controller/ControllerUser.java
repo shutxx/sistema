@@ -32,14 +32,14 @@ public class ControllerUser {
 
     public void check(ModelUser usuario) throws SQLException {
         Connection con = ModelConexao.conector();
-        String sql = "select * from tbusuario where loginUsuario=? and senhaUsuario=?";
+        String sql = "select * from usuario where login=? and senha=?";
         try {
             pst = con.prepareStatement(sql);
             pst.setString(1, usuario.getLoginUser());
             pst.setString(2, usuario.getSenhaUser());
             rs = pst.executeQuery();
             if (rs.next()) {
-                String perfil = rs.getString(4);
+                String perfil = rs.getString(5);
                 if (perfil.equals("admin")) {
                     Menu menu = new Menu();
                     menu.setVisible(true);
@@ -49,7 +49,7 @@ public class ControllerUser {
                 } else {
                     Menu menu = new Menu();
                     menu.setVisible(true);
-                    con.close();
+                    ModelConexao.fechaConexao(con);
                     login.dispose();
                 }
             } else {

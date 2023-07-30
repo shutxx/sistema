@@ -15,7 +15,7 @@ public class ModelConexao {
     public static Connection conector() throws SQLException {
         java.sql.Connection conexao = null;
         String driver = "com.mysql.cj.jdbc.Driver";
-        String url = "jdbc:mysql://localhost:3306/teste";
+        String url = "jdbc:mysql://localhost:3306/sistema";
         String user = "root";
         String password = "root";
         try {

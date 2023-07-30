@@ -4,9 +4,20 @@
  */
 package br.com.telas;
 
-import br.com.util.PosicaoFormulario;
-import java.text.DateFormat;
-import java.util.Date;
+import br.com.conexao.ModelConexao;
+import br.com.util.Uteis;
+import java.awt.Image;
+import java.awt.Graphics;
+import javax.swing.ImageIcon;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -14,15 +25,19 @@ import java.util.Date;
  */
 public class Menu extends javax.swing.JFrame {
 
-    PosicaoFormulario form = new PosicaoFormulario();
+    Connection conexao = null;
+    Uteis form = new Uteis();
+    CadPessoa CDP = new CadPessoa();
 
     /**
      * Creates new form Menu
+     *
+     * @throws java.sql.SQLException
      */
-    public Menu() {
+    public Menu() throws SQLException {
         initComponents();
+        setIconImage(new ImageIcon(getClass().getResource("/br/com/images/ico.ico")).getImage());
         setExtendedState(MAXIMIZED_BOTH);
-        //setResizable(false);
     }
 
     /**
@@ -34,9 +49,13 @@ public class Menu extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        DesktopMenu = new javax.swing.JDesktopPane();
-        jPanel2 = new javax.swing.JPanel();
-        txtData = new javax.swing.JLabel();
+        ImageIcon icon = new ImageIcon(getClass().getResource("/br/com/images/Menu.png"));
+        Image image = icon.getImage();
+        DesktopMenu = new javax.swing.JDesktopPane(){
+            public void paintComponent(Graphics g){
+                g.drawImage(image,0,0,getWidth(), getHeight(),this);
+            }
+        };
         jMenuBar1 = new javax.swing.JMenuBar();
         menuFinan = new javax.swing.JMenu();
         menuAbertCaixa = new javax.swing.JMenuItem();
@@ -44,12 +63,13 @@ public class Menu extends javax.swing.JFrame {
         menuContReceber = new javax.swing.JMenuItem();
         menuCadPagamento = new javax.swing.JMenuItem();
         menuConsultaConta = new javax.swing.JMenuItem();
+        jMenu1 = new javax.swing.JMenu();
+        RelClient = new javax.swing.JMenuItem();
         menuCliente = new javax.swing.JMenu();
         MenuCadCliente = new javax.swing.JMenuItem();
         menuCadFornec = new javax.swing.JMenuItem();
         menuProd = new javax.swing.JMenu();
         menuCadProd = new javax.swing.JMenuItem();
-        menuPrecoProd = new javax.swing.JMenuItem();
         menuConsultaProd = new javax.swing.JMenuItem();
         menuEstoque = new javax.swing.JMenu();
         menuEntraEstoq = new javax.swing.JMenuItem();
@@ -62,46 +82,35 @@ public class Menu extends javax.swing.JFrame {
         menuOS = new javax.swing.JMenu();
         menuCriarOS = new javax.swing.JMenuItem();
         menuListServ = new javax.swing.JMenuItem();
+        jMenu = new javax.swing.JMenu();
+        Sair = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
+        setTitle("Tech. Torres - Menu");
         setName("menu"); // NOI18N
         addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowActivated(java.awt.event.WindowEvent evt) {
-                formWindowActivated(evt);
+            public void windowClosing(java.awt.event.WindowEvent evt) {
+                formWindowClosing(evt);
             }
         });
+
+        DesktopMenu.setBackground(new java.awt.Color(102, 102, 102));
+        DesktopMenu.setName(""); // NOI18N
 
         javax.swing.GroupLayout DesktopMenuLayout = new javax.swing.GroupLayout(DesktopMenu);
         DesktopMenu.setLayout(DesktopMenuLayout);
         DesktopMenuLayout.setHorizontalGroup(
             DesktopMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 862, Short.MAX_VALUE)
+            .addGap(0, 1096, Short.MAX_VALUE)
         );
         DesktopMenuLayout.setVerticalGroup(
             DesktopMenuLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 599, Short.MAX_VALUE)
-        );
-
-        txtData.setText("data");
-
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(txtData)
-                .addGap(19, 19, 19))
-        );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(txtData))
+            .addGap(0, 725, Short.MAX_VALUE)
         );
 
         jMenuBar1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
+        menuFinan.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/images/Briefcase.png"))); // NOI18N
         menuFinan.setText("Financeiro");
         menuFinan.setEnabled(false);
         menuFinan.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
@@ -126,15 +135,25 @@ public class Menu extends javax.swing.JFrame {
         menuConsultaConta.setText("Consultar Contas");
         menuFinan.add(menuConsultaConta);
 
-        jMenuBar1.add(menuFinan);
+        jMenu1.setText("Relatorios");
+        jMenu1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
-        menuCliente.setText("Pessoa");
-        menuCliente.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        menuCliente.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                menuClienteMouseClicked(evt);
+        RelClient.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        RelClient.setText("Clientes");
+        RelClient.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                RelClientActionPerformed(evt);
             }
         });
+        jMenu1.add(RelClient);
+
+        menuFinan.add(jMenu1);
+
+        jMenuBar1.add(menuFinan);
+
+        menuCliente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/images/People.png"))); // NOI18N
+        menuCliente.setText("Pessoa");
+        menuCliente.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
         MenuCadCliente.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         MenuCadCliente.setText("Cadastro de Cliente");
@@ -146,7 +165,7 @@ public class Menu extends javax.swing.JFrame {
         menuCliente.add(MenuCadCliente);
 
         menuCadFornec.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        menuCadFornec.setText("Cadastro Fornecedor");
+        menuCadFornec.setText("Cadastro Funcionario");
         menuCadFornec.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 menuCadFornecActionPerformed(evt);
@@ -156,23 +175,31 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(menuCliente);
 
+        menuProd.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/images/Shopping cart.png"))); // NOI18N
         menuProd.setText("Produto");
         menuProd.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
         menuCadProd.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         menuCadProd.setText("Cadastro de Produto");
+        menuCadProd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuCadProdActionPerformed(evt);
+            }
+        });
         menuProd.add(menuCadProd);
-
-        menuPrecoProd.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        menuPrecoProd.setText("Preço Produto");
-        menuProd.add(menuPrecoProd);
 
         menuConsultaProd.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         menuConsultaProd.setText("Consulta Produto");
+        menuConsultaProd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuConsultaProdActionPerformed(evt);
+            }
+        });
         menuProd.add(menuConsultaProd);
 
         jMenuBar1.add(menuProd);
 
+        menuEstoque.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/images/Database.png"))); // NOI18N
         menuEstoque.setText("Estoque");
         menuEstoque.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
@@ -190,11 +217,17 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(menuEstoque);
 
+        menuVenda.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/images/Buy.png"))); // NOI18N
         menuVenda.setText("Venda");
         menuVenda.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
         menuPedido.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         menuPedido.setText("Digitação de Pedido");
+        menuPedido.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuPedidoActionPerformed(evt);
+            }
+        });
         menuVenda.add(menuPedido);
 
         menuConsultaPedido.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
@@ -207,6 +240,7 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(menuVenda);
 
+        menuOS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/images/Clipboard.png"))); // NOI18N
         menuOS.setText("Ordem Serviço");
         menuOS.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
@@ -220,6 +254,23 @@ public class Menu extends javax.swing.JFrame {
 
         jMenuBar1.add(menuOS);
 
+        jMenu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/images/Application.png"))); // NOI18N
+        jMenu.setText("Conf.");
+        jMenu.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+
+        Sair.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_DOWN_MASK));
+        Sair.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        Sair.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/com/images/Exit.png"))); // NOI18N
+        Sair.setText("Sair");
+        Sair.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                SairActionPerformed(evt);
+            }
+        });
+        jMenu.add(Sair);
+
+        jMenuBar1.add(jMenu);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -227,47 +278,88 @@ public class Menu extends javax.swing.JFrame {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(DesktopMenu)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(29, 29, 29))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(DesktopMenu)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(6, 6, 6))
+            .addComponent(DesktopMenu, javax.swing.GroupLayout.Alignment.TRAILING)
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void menuClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_menuClienteMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_menuClienteMouseClicked
-
     private void MenuCadClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_MenuCadClienteActionPerformed
-        // TODO add your handling code here:
-        //CadCliente cad = new CadCliente();
-        //this.DesktopMenu.add(cad);
-        //cad.setVisible(true);
         CadPessoa cad;
         form.abrirFormulario(cad = new CadPessoa(), DesktopMenu);
     }//GEN-LAST:event_MenuCadClienteActionPerformed
 
-    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
-        // TODO add your handling code here:
-        Date data = new Date();
-        DateFormat formatador = DateFormat.getDateInstance(DateFormat.SHORT);
-        txtData.setText(formatador.format(data));
-    }//GEN-LAST:event_formWindowActivated
-
     private void menuCadFornecActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCadFornecActionPerformed
         // TODO add your handling code here:
-        CadFornecedor fornec;
-        form.abrirFormulario(fornec = new CadFornecedor(), DesktopMenu);
+        CadFuncionario func;
+        form.abrirFormulario(func = new CadFuncionario(), DesktopMenu);
     }//GEN-LAST:event_menuCadFornecActionPerformed
+
+    private void SairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_SairActionPerformed
+        // TODO add your handling code here:
+        form.sair(this);
+
+    }//GEN-LAST:event_SairActionPerformed
+
+    private void menuCadProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuCadProdActionPerformed
+        // TODO add your handling code here:
+        CadProduto prod;
+        form.abrirFormulario(prod = new CadProduto(), DesktopMenu);
+    }//GEN-LAST:event_menuCadProdActionPerformed
+
+    private void menuConsultaProdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuConsultaProdActionPerformed
+        // TODO add your handling code here:
+        ListProd preco;
+        form.abrirFormulario(preco = new ListProd(), DesktopMenu);
+    }//GEN-LAST:event_menuConsultaProdActionPerformed
+
+    private void RelClientActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_RelClientActionPerformed
+        // TODO add your handling code here:
+        if (JOptionPane.showConfirmDialog(this,
+                "Confirmar impressão",
+                "Atenção",
+                JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+            try {
+                conexao = ModelConexao.conector();
+                JasperPrint print = JasperFillManager.fillReport(
+                        "C:/reports/clientes.jasper",
+                        null,
+                        conexao);
+                //JasperViewer.viewReport(print, false);
+                JasperViewer jv = new JasperViewer(print,
+                        false);
+                jv.setTitle("Relatorio de Clientes");
+                jv.setIconImage(new ImageIcon(getClass().getResource("/br/com/images/ico.ico")).getImage());
+                jv.setVisible(true);
+                ModelConexao.fechaConexao(conexao);
+            } catch (SQLException | JRException e) {
+                JOptionPane.showMessageDialog(this, e);
+            }
+        }
+    }//GEN-LAST:event_RelClientActionPerformed
+
+    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
+        // TODO add your handling code here:
+        form.sair(this);
+    }//GEN-LAST:event_formWindowClosing
+
+    private void menuPedidoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuPedidoActionPerformed
+        // TODO add your handling code here:
+        CadVenda cadv;
+        try {
+            cadv = new CadVenda(this);
+        } catch (SQLException ex) {
+            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            form.abrirFormulario(cadv = new CadVenda(this), DesktopMenu);
+        } catch (SQLException ex) {
+            Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_menuPedidoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -299,16 +391,22 @@ public class Menu extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Menu().setVisible(true);
+                try {
+                    new Menu().setVisible(true);
+                } catch (SQLException ex) {
+                    Logger.getLogger(Menu.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
     }
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JDesktopPane DesktopMenu;
+    public javax.swing.JDesktopPane DesktopMenu;
     private javax.swing.JMenuItem MenuCadCliente;
+    private javax.swing.JMenuItem RelClient;
+    private javax.swing.JMenuItem Sair;
+    private javax.swing.JMenu jMenu;
+    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JMenuItem menuAbertCaixa;
     private javax.swing.JMenuItem menuCadFornec;
     private javax.swing.JMenuItem menuCadPagamento;
@@ -329,9 +427,7 @@ public class Menu extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuListServ;
     private javax.swing.JMenu menuOS;
     private javax.swing.JMenuItem menuPedido;
-    private javax.swing.JMenuItem menuPrecoProd;
     private javax.swing.JMenu menuProd;
     private javax.swing.JMenu menuVenda;
-    private javax.swing.JLabel txtData;
     // End of variables declaration//GEN-END:variables
 }
